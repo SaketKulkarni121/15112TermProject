@@ -77,19 +77,19 @@ def onAppStart(app):
 def onMousePress(app, mouseX, mouseY):
     (app.mouseX, app.mouseY) = (mouseX, mouseY)
 
-    if app.startButton.isClicked(app):
+    if app.startButton.isClicked(app) and app.showSplashScreen:
         app.showSplashScreen = False
         app.showSelectScreen = True
 
-    if app.classicButton.isClicked(app):
+    elif app.classicButton.isClicked(app) and app.showSelectScreen:
         app.showSelectScreen = False
         app.classicGameMode = True
 
-    if app.arcadeButton.isClicked(app):
+    elif app.arcadeButton.isClicked(app) and app.showSelectScreen:
         app.showSelectScreen = False
         app.arcadeGameMode = True
 
-    if app.zenButton.isClicked(app):
+    elif app.zenButton.isClicked(app) and app.showSelectScreen:
         app.showSelectScreen = False
         app.zenGameMode = True
         
@@ -99,7 +99,11 @@ def redrawAll(app):
         board.drawSplashScreen(app, board)
     elif app.showSelectScreen:
         board.drawGameSelectScreen(app, board)
-    elif app.classicGameMode or app.arcadeGameMode or app.zenGameMode:
+    elif app.classicGameMode:
+        board.drawClassicModeScreen(app, board)
+    elif app.arcadeGameMode:
+        board.drawClassicModeScreen(app, board)
+    elif app.zenGameMode:
         board.drawClassicModeScreen(app, board)
     else:
         drawRect(0, 0, app.width, app.height, fill = "blue")
