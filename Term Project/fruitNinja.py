@@ -2,6 +2,7 @@ from cmu_graphics import *
 import cv2
 import mediapipe
 from PIL import Image
+import time
 
 class Button:
     def __init__(self, centerX, centerY, width, height, fillColor, textColor, text, textSize):
@@ -25,6 +26,30 @@ class Button:
             and (app.mouseY < self.centerY + self.height//2 + self.height//2) and (app.mouseY > self.centerY - self.height//2 and self.height//2): 
                 return True
         
+
+class Game:
+    def __init__(self, score, lives):
+        app.score = 0
+        app.lives = lives
+
+    def spawnFruit():
+        pass
+
+    def moveFruit():
+        pass
+
+    def checkCollision():
+        pass
+
+    def updateScore():
+        pass
+
+    def updateLives():
+        pass
+
+    def endGame():
+        pass
+        
 class fruit:
     def getFruit(fruit):
         if fruit == "apple":
@@ -34,13 +59,22 @@ class fruit:
         elif fruit == "banana":
             return Image.open("images/fruitImages/banana.png").resize((50, 50))
     
-class board:
+class screen:
     def getBackground():
        return Image.open("images/background.png")
     
     def getLogo():
         img = Image.open("images/logo.png")
         return img.resize((700, 120), Image.BICUBIC)
+    
+    def getScore():
+        return Image.open("images/score.png").resize((100, 50), Image.BICUBIC)
+    
+    def getEmptyCross():
+        return Image.open("images/emptyCross.png").resize((65, 50), Image.BICUBIC)
+
+    def getFullCross():
+        return Image.open("images/fullCross.png").resize((65, 50), Image.BICUBIC)
 
     def drawSplashScreen(app, board):
         drawImage(CMUImage(board.getBackground()), 0, 0, width = app.width, height = app.height)
@@ -56,6 +90,28 @@ class board:
 
     def drawClassicModeScreen(app, board):
         drawImage(CMUImage(board.getBackground()), 0, 0, width = app.width, height = app.height)
+        drawImage(CMUImage(board.getScore()), 0, 0)
+        drawLabel(app.score, 175, 25, fill = "white", font = "montserrat", size = 70)
+        if app.lives == 0:
+            drawImage(CMUImage(board.getFullCross()), app.width - 50, 0)
+            drawImage(CMUImage(board.getFullCross()), app.width - 100, 0)
+            drawImage(CMUImage(board.getFullCross()), app.width - 150, 0)
+        elif app.lives == 1:
+            drawImage(CMUImage(board.getFullCross()), app.width - 50, 0)
+            drawImage(CMUImage(board.getFullCross()), app.width - 100, 0)
+            drawImage(CMUImage(board.getEmptyCross()), app.width - 150, 0)
+        elif app.lives == 2:
+            drawImage(CMUImage(board.getFullCross()), app.width - 50, 0)
+            drawImage(CMUImage(board.getEmptyCross()), app.width - 100, 0)
+            drawImage(CMUImage(board.getEmptyCross()), app.width - 150, 0)
+        elif app.lives == 3:
+            drawImage(CMUImage(board.getEmptyCross()), app.width - 50, 0)
+            drawImage(CMUImage(board.getEmptyCross()), app.width - 100, 0)
+            drawImage(CMUImage(board.getEmptyCross()), app.width - 150, 0)
+
+        if app.showTimer:
+            drawLabel(app.timer, app.width//2, 25, fill = "white", font = "montserrat", size = 70)
+
 
 
 def onAppStart(app):
@@ -73,6 +129,15 @@ def onAppStart(app):
     app.classicButton = Button(app.width//4, app.height//2, app.width//4 - 100, 50, "gray","white", "Classic Mode", 30)
     app.arcadeButton = Button(2 * app.width//4, app.height//2, app.width//4 - 100, 50, "gray","white", "Arcade Mode", 30)
     app.zenButton = Button(3 * app.width//4, app.height//2, app.width//4 - 100, 50, "gray","white", "Zen Mode", 30)
+
+    app.score = 0
+    app.lives = 3
+
+    app.showTimer = True
+    app.timer = time.strftime("%H:%M:%S", time.localtime())
+
+def onStep(app):
+    app.timer = time.strftime("%H:%M:%S", time.localtime())
 
 def onMousePress(app, mouseX, mouseY):
     (app.mouseX, app.mouseY) = (mouseX, mouseY)
@@ -92,19 +157,19 @@ def onMousePress(app, mouseX, mouseY):
     elif app.zenButton.isClicked(app) and app.showSelectScreen:
         app.showSelectScreen = False
         app.zenGameMode = True
-        
+
 
 def redrawAll(app):
     if app.showSplashScreen:
-        board.drawSplashScreen(app, board)
+        screen.drawSplashScreen(app, screen)
     elif app.showSelectScreen:
-        board.drawGameSelectScreen(app, board)
+        screen.drawGameSelectScreen(app, screen)
     elif app.classicGameMode:
-        board.drawClassicModeScreen(app, board)
+        screen.drawClassicModeScreen(app, screen)
     elif app.arcadeGameMode:
-        board.drawClassicModeScreen(app, board)
+        screen.drawClassicModeScreen(app, screen)
     elif app.zenGameMode:
-        board.drawClassicModeScreen(app, board)
+        screen.drawClassicModeScreen(app, screen)
     else:
         drawRect(0, 0, app.width, app.height, fill = "blue")
 
