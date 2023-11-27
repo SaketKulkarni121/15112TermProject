@@ -5,22 +5,20 @@ from PIL import Image
 import math
 import random
 
-# video = cv2.VideoCapture(0)
-# hands = mediapipe.solutions.hands.Hands()
 
-# def getHandPosition(app):
-#     __, image = video.read()
-#     imageRGB = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-#     result = hands.process(imageRGB)
+def getHandPosition(app):
+    __, image = app.video.read()
+    imageRGB = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    result = app.hands.process(imageRGB)
 
-#     if result.multi_hand_landmarks:
-#         for hand in result.multi_hand_landmarks:
-#             for id, landmark in enumerate(hand.landmark):
-#                 w, h = 1200, 600
-#                 cx, cy = w -  int(landmark.x * w), int(landmark.y * h)
+    if result.multi_hand_landmarks:
+        for hand in result.multi_hand_landmarks:
+            for id, landmark in enumerate(hand.landmark):
+                w, h = 1200, 600
+                cx, cy = w -  int(landmark.x * w), int(landmark.y * h)
 
-#                 if id == 8:
-#                     app.mouseX, app.mouseY = (cx, cy)
+                if id == 8:
+                    app.mouseX, app.mouseY = (cx, cy)
 
 
 class Button:
@@ -56,7 +54,7 @@ class Game:
         app.paused = False
 
     def spawnFruit(app):
-        fruits = ["apple", "banana", "coconut", "kiwi", "mango", "pineapple", "strawberry", "watermelon"]
+        fruits = ["apple", "banana", "coconut", "kiwi", "mango", "pineapple", "strawberry", "watermelon", "bomb"]
         fruit = fruits[random.randint(0, len(fruits) - 1)]
         app.fruits.append(Fruit(app, fruit, random.randint(0, app.width-100), random.randint(11, 18), random.randint(30, 150)))
 
@@ -69,15 +67,22 @@ class Game:
         for fruit in app.fruits:
             if fruit.yPosition > app.height:
                 app.fruits.remove(fruit)
-                app.lives -= 1
+                if fruit.fruit != "bomb":
+                    app.lives -= 1
             elif fruit.xPosition < 0 or fruit.xPosition > app.width:
                 app.fruits.remove(fruit)
-                app.lives -= 1
+                if fruit.fruit != "bomb":
+                    app.lives -= 1
             elif app.mouseX < fruit.xPosition + 100 and app.mouseX > fruit.xPosition\
                 and app.mouseY < fruit.yPosition + 100 and app.mouseY > fruit.yPosition:
+                if fruit.fruit == "bomb":
+                    app.lives -= 1
+                else:
+                    app.score += app.additionalPoints
+                    if app.arcadeGameMode:
+                        app.seconds += 5
                 app.fruits.remove(fruit)
-                app.score += app.additionalPoints
-        
+            
 class Fruit:
     def __init__(self, app, fruit, startXPos, speed, angle):
         self.fruit = fruit
@@ -98,6 +103,8 @@ class Fruit:
             self.weight = 0.9
         elif self.fruit == "watermelon":
             self.weight = 2
+        elif self.fruit == "bomb":
+            self.weight = 1.5
 
         self.speed = speed
         self.xSpeed = speed
@@ -128,7 +135,8 @@ class Fruit:
             return Image.open("images/fruitImages/strawberry.png").resize((50, 50))
         elif self.fruit == "watermelon":
             return Image.open("images/fruitImages/watermelon.png").resize((100, 100))
-        
+        elif self.fruit == "bomb":
+            return Image.open("images/bomb.png").resize((100, 100))
         
     
 class screen:
@@ -159,6 +167,7 @@ class screen:
         app.classicButton.getButton()
         app.arcadeButton.getButton()
         app.zenButton.getButton()
+        app.useHandsButton.getButton()
 
     def drawClassicModeScreen(app, board):
         drawImage(CMUImage(board.getBackground()), 0, 0, width = app.width, height = app.height)
@@ -214,6 +223,7 @@ def onAppStart(app):
     app.classicButton = Button(app.width//4, app.height//2, app.width//4 - 100, 50, "gray","white", "Classic Mode", 30)
     app.arcadeButton = Button(2 * app.width//4, app.height//2, app.width//4 - 100, 50, "gray","white", "Arcade Mode", 30)
     app.zenButton = Button(3 * app.width//4, app.height//2, app.width//4 - 100, 50, "gray","white", "Zen Mode", 30)
+    app.useHandsButton = Button(app.width//2, app.height//2 + 100, app.width//2 - 100, 50, "gray","white", "Use Hands", 30)
 
     app.resetButton = Button(app.width//2, app.height//2 + 200, app.width//2 - 100, 50, "gray","white", "Reset Game", 30)
 
@@ -234,12 +244,17 @@ def onAppStart(app):
     app.numOfSpawns = 1
     app.additionalPoints = 10
 
+    app.useHands = False
+
     app.paused = False
 
 def onStep(app):
     app.steps += 1
 
-    getHandPosition(app)
+    if app.useHands:
+        app.video = cv2.VideoCapture(0)
+        app.hands = mediapipe.solutions.hands.Hands()
+        getHandPosition(app)
 
     if app.classicGameMode and not app.paused:
         if app.steps % 30 == 0:
@@ -287,6 +302,51 @@ def onStep(app):
             app.numOfSpawns = 6
             app.additionalPoints = 60
 
+    if app.arcadeGameMode and not app.paused:
+        if app.steps % 30 == 0:
+            mins, secs = divmod(app.seconds, 60)
+            timeformat = '{:02d}:{:02d}'.format(mins, secs)
+            app.seconds -= 1
+            app.timer = timeformat
+        if app.seconds == 0:
+            app.paused = True
+            app.endGameScreen = True
+            app.classicGameMode = False
+        if app.steps % app.spawnsPerTick == 0:
+            for _ in range(app.numOfSpawns):
+                Game.spawnFruit(app)
+        Game.checkCollision(app) 
+
+        if app.lives == 0:
+            app.paused = True
+            app.endGameScreen = True
+            app.classicGameMode = False
+
+        if app.score == 100:
+            app.spawnsPerTick = 50
+            app.difficultyLevel = "Medium"
+            app.numOfSpawns = 2
+            app.additonalPoints = 20
+        elif app.score == 200:
+            app.spawnsPerTick = 40
+            app.difficultyLevel = "Hard"
+            app.numOfSpawns = 3
+            app.additionalPoints = 30
+        elif app.score == 300:
+            app.spawnsPerTick = 30
+            app.difficultyLevel = "Insane"
+            app.numOfSpawns = 4
+            app.additionalPoints = 40
+        elif app.score == 400:
+            app.spawnsPerTick = 20
+            app.difficultyLevel = "Impossible"
+            app.numOfSpawns = 5
+            app.additionalPoints = 50
+        elif app.score == 500:
+            app.spawnsPerTick = 10
+            app.difficultyLevel = "God Mode"
+            app.numOfSpawns = 6
+            app.additionalPoints = 60
 
     if app.zenGameMode and not app.paused:
         if app.steps % app.spawnsPerTick == 0:
@@ -333,6 +393,9 @@ def onMousePress(app, mouseX, mouseY):
         app.showSplashScreen = False
         app.showSelectScreen = True
 
+    elif app.useHandsButton.isClicked(app) and app.showSelectScreen:
+        app.useHands = True
+
     elif app.classicButton.isClicked(app) and app.showSelectScreen:
         app.showSelectScreen = False
         app.classicGameMode = True
@@ -342,12 +405,12 @@ def onMousePress(app, mouseX, mouseY):
     elif app.arcadeButton.isClicked(app) and app.showSelectScreen:
         app.showSelectScreen = False
         app.arcadeGameMode = True
+        Game(app, 3, True, 30, "Easy")
 
     elif app.zenButton.isClicked(app) and app.showSelectScreen:
         app.showSelectScreen = False
         app.zenGameMode = True
         Game(app, 3, False, 90, "Easy")
-
 
     elif app.resetButton.isClicked(app) and app.endGameScreen:
         app.showSplashScreen = True
