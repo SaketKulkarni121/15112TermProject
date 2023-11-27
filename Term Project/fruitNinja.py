@@ -3,6 +3,7 @@ import cv2
 import mediapipe
 from PIL import Image
 import time
+import math
 
 class Button:
     def __init__(self, centerX, centerY, width, height, fillColor, textColor, text, textSize):
@@ -28,9 +29,14 @@ class Button:
         
 
 class Game:
-    def __init__(self, score, lives):
+    def __init__(self, score, lives, showTime, timeLimit):
         app.score = 0
         app.lives = lives
+        app.timer = timeLimit
+        app.showTimer = showTime
+
+        # px, py = app.fruits[0].getPos()
+        # drawImage(CMUImage(app.fruits[0].getFruit()), px, py)
 
     def spawnFruit():
         pass
@@ -51,13 +57,56 @@ class Game:
         pass
         
 class fruit:
-    def getFruit(fruit):
-        if fruit == "apple":
-            return Image.open("images/fruitImages/apple.png").resize((50, 50))
-        elif fruit == "watermelon":
-            return Image.open("images/fruitImages/watermelon.png").resize((50, 50))
-        elif fruit == "banana":
-            return Image.open("images/fruitImages/banana.png").resize((50, 50))
+    def __init__(self, app, fruit, startXPos, speed, angle):
+        self.fruit = fruit
+
+        if self.fruit == "apple":
+            self.weight = 1.1
+        elif self.fruit == "banana":
+            self.weight = 1.3
+        elif self.fruit == "coconut":
+            self.weight = 1.5
+        elif self.fruit == "kiwi":
+            self.weight = 1
+        elif self.fruit == "mango":
+            self.weight = 1.5
+        elif self.fruit == "pineapple":
+            self.weight = 1.7
+        elif self.fruit == "strawberry":
+            self.weight = 0.9
+        elif self.fruit == "watermelon":
+            self.weight = 2
+
+        self.speed = speed
+        self.angle = angle
+        self.xPosition = startXPos
+        self.yPosition = app.height
+
+    def getPos(self):
+        self.xPosition = self.speed * math.cos(math.radians(self.angle)) + self.xPosition
+        self.yPosition = self.yPosition - ((self.speed * math.sin(math.radians(self.angle))) * self.weight)
+        self.speed -= 0.2 * self.weight
+        return self.xPosition, self.yPosition
+
+    def getFruit(self):
+        if self.fruit == "apple":
+            return Image.open("images/fruitImages/apple.png").resize((75, 75))
+        elif self.fruit == "banana":
+            return Image.open("images/fruitImages/banana.png").resize((100, 100))
+        elif self.fruit == "coconut":
+            return Image.open("images/fruitImages/coconut.png").resize((100, 100))
+        elif self.fruit == "kiwi":
+            return Image.open("images/fruitImages/kiwi.png").resize((60, 60))
+        elif self.fruit == "mango":
+            return Image.open("images/fruitImages/mango.png").resize((75, 75))
+        elif self.fruit == "pineapple":
+            return Image.open("images/fruitImages/pineapple.png").resize((100, 100))
+        elif self.fruit == "strawberry":
+            return Image.open("images/fruitImages/strawberry.png").resize((50, 50))
+        elif self.fruit == "watermelon":
+            return Image.open("images/fruitImages/watermelon.png").resize((100, 100))
+        
+        
     
 class screen:
     def getBackground():
@@ -132,9 +181,12 @@ def onAppStart(app):
 
     app.score = 0
     app.lives = 3
+    app.difficultyLevel = "Easy"
 
     app.showTimer = True
     app.timer = time.strftime("%H:%M:%S", time.localtime())
+
+    app.fruits = [fruit(app, "apple", app.width//2, 14, 90)]
 
 def onStep(app):
     app.timer = time.strftime("%H:%M:%S", time.localtime())
