@@ -4,10 +4,7 @@ import mediapipe
 from PIL import Image
 import math
 import random
-import os
 
-#Hand goes through side should be worth less points
-#Time taken to cut the fruit
 #High Score list
 
 def getHandPosition(app):
@@ -16,11 +13,14 @@ def getHandPosition(app):
     result = app.hands.process(imageRGB)
 
     if result.multi_hand_landmarks:
-        for hand in result.multi_hand_landmarks:
+        for handNum, hand in enumerate(result.multi_hand_landmarks):
             for id, landmark in enumerate(hand.landmark):
                 if id == 8:
                     cx, cy = app.width -  int(landmark.x * app.width), int(landmark.y * app.height)
-                    app.mouseX, app.mouseY = (cx, cy)
+                    if handNum == 0:
+                        app.mouseX, app.mouseY = (cx, cy)
+                    else:
+                        app.mouseX2, app.mouseY2 = (cx, cy)
 
 
 class Button:
@@ -85,34 +85,22 @@ class Game:
                 if fruit.fruit == "bomb":
                     app.lives -= 1
                 else:
-                    app.score += app.additionalPoints
+                    if app.mouseX < fruit.xPosition + 60 and app.mouseX > fruit.xPosition + 40\
+                        or app.mouseY < fruit.yPosition + 40  and app.mouseY > fruit.yPosition + 60:
+                            app.score += app.additionalPoints + 15
+                    elif app.mouseX < fruit.xPosition + 80 and app.mouseX > fruit.xPosition + 20\
+                        or app.mouseY < fruit.yPosition + 40  and app.mouseY > fruit.yPosition + 60:
+                            app.score += app.additionalPoints + 10
+                    else:
+                        app.score += app.additionalPoints
                     if app.arcadeGameMode:
-                        app.seconds += 5
+                        app.seconds += 1
                 app.fruits.remove(fruit)
             
 class Fruit:
     def __init__(self, app, fruit, startXPos, speed, angle):
         self.fruit = fruit
         self.weight = 1.8
-
-        # if self.fruit == "apple":
-        #     self.weight = 1.1
-        # elif self.fruit == "banana":
-        #     self.weight = 1.3
-        # elif self.fruit == "coconut":
-        #     self.weight = 1.5
-        # elif self.fruit == "kiwi":
-        #     self.weight = 1
-        # elif self.fruit == "mango":
-        #     self.weight = 1.5
-        # elif self.fruit == "pineapple":
-        #     self.weight = 1.7
-        # elif self.fruit == "strawberry":
-        #     self.weight = 0.9
-        # elif self.fruit == "watermelon":
-        #     self.weight = 2
-        # elif self.fruit == "bomb":
-        #     self.weight = 1.5
 
         self.speed = speed
         self.xSpeed = speed
@@ -128,43 +116,41 @@ class Fruit:
 
     def getFruit(self):
         if self.fruit == "apple":
-            return Image.open("images/fruitImages/apple.png").resize((75, 75))
+            return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/fruitImages/apple.png").resize((75, 75))
         elif self.fruit == "banana":
-            return Image.open("images/fruitImages/banana.png").resize((100, 100))
+            return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/fruitImages/banana.png").resize((100, 100))
         elif self.fruit == "coconut":
-            return Image.open("images/fruitImages/coconut.png").resize((100, 100))
+            return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/fruitImages/coconut.png").resize((100, 100))
         elif self.fruit == "kiwi":
-            return Image.open("images/fruitImages/kiwi.png").resize((60, 60))
+            return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/fruitImages/kiwi.png").resize((60, 60))
         elif self.fruit == "mango":
-            return Image.open("images/fruitImages/mango.png").resize((75, 75))
+            return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/fruitImages/mango.png").resize((75, 75))
         elif self.fruit == "pineapple":
-            return Image.open("images/fruitImages/pineapple.png").resize((100, 100))
+            return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/fruitImages/pineapple.png").resize((100, 100))
         elif self.fruit == "strawberry":
-            return Image.open("images/fruitImages/strawberry.png").resize((50, 50))
+            return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/fruitImages/strawberry.png").resize((50, 50))
         elif self.fruit == "watermelon":
-            return Image.open("images/fruitImages/watermelon.png").resize((100, 100))
+            return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/fruitImages/watermelon.png").resize((100, 100))
         elif self.fruit == "bomb":
-            return Image.open("images/bomb.png").resize((100, 100))
-
-
+            return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/bomb.png").resize((100, 100))
         
     
 class screen:
     def getBackground():
-        return Image.open("images/background.png")
+        return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject//images/background.png")
     
     def getLogo():
-        img = Image.open("images/logo.png")
+        img = Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/logo.png")
         return img.resize((700, 120), Image.BICUBIC)
     
     def getScore():
-        return Image.open("images/score.png").resize((100, 50), Image.BICUBIC)
+        return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/score.png").resize((100, 50), Image.BICUBIC)
     
     def getEmptyCross():
-        return Image.open("images/emptyCross.png").resize((65, 50), Image.BICUBIC)
+        return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/emptyCross.png").resize((65, 50), Image.BICUBIC)
 
     def getFullCross():
-        return Image.open("images/fullCross.png").resize((65, 50), Image.BICUBIC)
+        return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/fullCross.png").resize((65, 50), Image.BICUBIC)
 
     def drawSplashScreen(app, board):
         drawImage(CMUImage(board.getBackground()), 0, 0, width = app.width, height = app.height)
@@ -177,6 +163,7 @@ class screen:
         app.classicButton.getButton()
         app.arcadeButton.getButton()
         app.zenButton.getButton()
+        app.multiplayerButton.getButton()
         app.useHandsButton.fillColor = app.usingHandsFill
         app.useHandsButton.getButton()
         app.showHighScores.getButton()
@@ -184,6 +171,7 @@ class screen:
     def drawClassicModeScreen(app, board):
         drawImage(CMUImage(board.getBackground()), 0, 0, width = app.width, height = app.height)
         drawImage(CMUImage(board.getScore()), 0, 0)
+        drawLabel(app.difficultyLevel, app.width//3, 25, fill = "white", font = "montserrat", size = 50)
         drawRect(0, 0, app.width, app.height, fill = "black", opacity = app.pausedOpacity)
 
         if app.pausedOpacity == 50:
@@ -193,6 +181,9 @@ class screen:
         app.pauseGameButton.fillColor = app.pausedFill
         app.pauseGameButton.getButton()
         drawCircle(app.mouseX, app.mouseY, 15, fill = "blue")
+        if app.multiplayerGameMode:
+            drawCircle(app.mouseX2, app.mouseY2, 15, fill = "red")
+
         drawLabel(app.score, 200, 25, fill = "white", font = "montserrat", size = 70)
         if app.lives == 0:
             drawImage(CMUImage(board.getFullCross()), app.width - 50, 0)
@@ -234,12 +225,15 @@ class screen:
 def onAppStart(app):
     app.mouseX = 0
     app.mouseY = 0
+    app.mouseX2 = 0
+    app.mouseY2 = 0
     app.showSplashScreen = True
     app.showSelectScreen = False
 
     app.classicGameMode = False
     app.arcadeGameMode = False
     app.zenGameMode = False
+    app.multiplayerGameMode = False
 
     app.endGameScreen = False
     app.showHighScoreScreen = False
@@ -251,11 +245,13 @@ def onAppStart(app):
 
     app.startButton = Button(app.width//2, app.height//2, app.width//2 - 100, 50, "gray","white", "Start Game", 30)
     
-    app.classicButton = Button(app.width//4, app.height//2, app.width//4 - 100, 50, "gray","white", "Classic Mode", 30)
-    app.arcadeButton = Button(2 * app.width//4, app.height//2, app.width//4 - 100, 50, "gray","white", "Arcade Mode", 30)
-    app.zenButton = Button(3 * app.width//4, app.height//2, app.width//4 - 100, 50, "gray","white", "Zen Mode", 30)
+    app.classicButton = Button(app.width//5, app.height//2, app.width//5 - 100, 50, "gray","white", "Classic Mode", 30)
+    app.arcadeButton = Button(2 * app.width//5, app.height//2, app.width//5 - 100, 50, "gray","white", "Arcade Mode", 30)
+    app.zenButton = Button(3 * app.width//5, app.height//2, app.width//5 - 100, 50, "gray","white", "Zen Mode", 30)
+    app.multiplayerButton = Button(4 * app.width//5, app.height//2 , app.width//5 - 100, 50, "gray","white", "Multiplayer", 30)
     app.useHandsButton = Button(app.width//2, app.height//2 + 100, app.width//2 - 100, 50, app.usingHandsFill, "white", "Use Hands", 30)
     app.showHighScores = Button(app.width//2, app.height//2 + 175, app.width//2 - 100, 50, "gray","white", "High Scores", 30)
+
 
     app.resetButton = Button(app.width//2, app.height//2 + 200, app.width//2 - 100, 50, "gray","white", "Reset Game", 30)
     app.goBackToSelectScreen = Button(85, 50, 85, 50, "gray","white", "Go Back", 30)
@@ -285,9 +281,17 @@ def onAppStart(app):
     app.hands = None
 
     app.paused = False
+    app.clearedBoard = 0
+
 
 def onStep(app):
     app.steps += 1
+    if app.fruits == []:
+        app.clearedBoard += 1
+    if app.clearedBoard == 300:
+        app.clearedBoard = 0
+        app.additionalPoints += 3
+        app.spawnsPerTick -= 3
     if app.paused:
         return
     if app.useHands:
@@ -322,31 +326,36 @@ def onStep(app):
             app.endGameScreen = True
             app.classicGameMode = False
 
-        if app.score == 50:
+        if app.score < 100:
+            app.spawnsPerTick = 40
+            app.difficultyLevel = "Easy"
+            app.numOfSpawns = 1
+            app.additonalPoints = 5
+        elif app.score < 300:
             app.spawnsPerTick = 40
             app.difficultyLevel = "Medium"
             app.numOfSpawns = 2
-            app.additonalPoints = 20
-        elif app.score == 100:
+            app.additonalPoints = 10
+        elif app.score < 700:
             app.spawnsPerTick = 30
             app.difficultyLevel = "Hard"
             app.numOfSpawns = 3
-            app.additionalPoints = 30
-        elif app.score == 200:
+            app.additionalPoints = 12
+        elif app.score < 1200:
             app.spawnsPerTick = 30
             app.difficultyLevel = "Insane"
             app.numOfSpawns = 4
-            app.additionalPoints = 40
-        elif app.score == 500:
+            app.additionalPoints = 18
+        elif app.score < 1800:
             app.spawnsPerTick = 20
             app.difficultyLevel = "Impossible"
             app.numOfSpawns = 5
-            app.additionalPoints = 50
-        elif app.score == 1000:
+            app.additionalPoints = 22
+        elif app.score < 3000:
             app.spawnsPerTick = 10
             app.difficultyLevel = "God Mode"
             app.numOfSpawns = 6
-            app.additionalPoints = 60
+            app.additionalPoints = 26
 
     if app.arcadeGameMode and not app.paused:
         if app.steps % 30 == 0:
@@ -366,33 +375,39 @@ def onStep(app):
         if app.lives == 0:
             app.paused = True
             app.endGameScreen = True
-            app.classicGameMode = False
+            app.arcadeGameMode = False
 
-        if app.score == 50:
+        
+        if app.score < 100:
+            app.spawnsPerTick = 40
+            app.difficultyLevel = "Easy"
+            app.numOfSpawns = 1
+            app.additonalPoints = 5
+        elif app.score < 300:
             app.spawnsPerTick = 40
             app.difficultyLevel = "Medium"
             app.numOfSpawns = 2
-            app.additonalPoints = 20
-        elif app.score == 100:
+            app.additonalPoints = 10
+        elif app.score < 700:
             app.spawnsPerTick = 30
             app.difficultyLevel = "Hard"
             app.numOfSpawns = 3
-            app.additionalPoints = 30
-        elif app.score == 200:
+            app.additionalPoints = 12
+        elif app.score < 1200:
             app.spawnsPerTick = 30
             app.difficultyLevel = "Insane"
             app.numOfSpawns = 4
-            app.additionalPoints = 40
-        elif app.score == 500:
+            app.additionalPoints = 18
+        elif app.score < 1800:
             app.spawnsPerTick = 20
             app.difficultyLevel = "Impossible"
             app.numOfSpawns = 5
-            app.additionalPoints = 50
-        elif app.score == 1000:
+            app.additionalPoints = 22
+        elif app.score < 3000:
             app.spawnsPerTick = 10
             app.difficultyLevel = "God Mode"
             app.numOfSpawns = 6
-            app.additionalPoints = 60
+            app.additionalPoints = 26
 
     if app.zenGameMode and not app.paused:
         if app.steps % app.spawnsPerTick == 0:
@@ -403,34 +418,12 @@ def onStep(app):
         if app.lives == 0:
             app.paused = True
             app.endGameScreen = True
-            app.classicGameMode = False
-
-        
-        if app.score == 50:
-            app.spawnsPerTick = 40
-            app.difficultyLevel = "Medium"
-            app.numOfSpawns = 2
-            app.additonalPoints = 20
-        elif app.score == 100:
-            app.spawnsPerTick = 30
-            app.difficultyLevel = "Hard"
-            app.numOfSpawns = 3
-            app.additionalPoints = 30
-        elif app.score == 200:
-            app.spawnsPerTick = 30
-            app.difficultyLevel = "Insane"
-            app.numOfSpawns = 4
-            app.additionalPoints = 40
-        elif app.score == 500:
-            app.spawnsPerTick = 20
-            app.difficultyLevel = "Impossible"
-            app.numOfSpawns = 5
-            app.additionalPoints = 50
-        elif app.score == 1000:
-            app.spawnsPerTick = 10
-            app.difficultyLevel = "God Mode"
-            app.numOfSpawns = 6
-            app.additionalPoints = 60
+            app.zenGameMode = False
+    
+        app.spawnsPerTick = 40
+        app.difficultyLevel = "ZEN"
+        app.numOfSpawns = 2
+        app.additonalPoints = 10
 
 
 def onMousePress(app, mouseX, mouseY):
@@ -467,6 +460,11 @@ def onMousePress(app, mouseX, mouseY):
         app.zenGameMode = True
         Game(app, 3, False, 90, "Easy")
 
+    elif app.multiplayerButton.isClicked(app) and app.showSelectScreen:
+        app.showSelectScreen = False
+        app.multiplayerGameMode = True
+        Game(app, 3, True, 90, "Easy")
+
     elif app.resetButton.isClicked(app) and app.endGameScreen:
         app.showSplashScreen = True
         app.endGameScreen = False
@@ -489,6 +487,8 @@ def onMousePress(app, mouseX, mouseY):
             app.pausedFill = "gray"
             app.pausedOpacity = 0
 
+    
+
     elif app.goBackToSelectScreen.isClicked(app) and app.showHighScoreScreen:
         app.showHighScoreScreen = False
         app.showSelectScreen = True
@@ -510,10 +510,10 @@ def redrawAll(app):
         screen.drawClassicModeScreen(app, screen)
     elif app.endGameScreen:
         screen.drawAppEndScreen(app, screen)
+    elif app.multiplayerGameMode:
+        screen.drawClassicModeScreen(app, screen)
     elif app.showHighScoreScreen:
         screen.drawHighScore(app, screen)
-    else:
-        drawRect(0, 0, app.width, app.height, fill = "blue")
 
 def main():
     runApp(1200, 600)
