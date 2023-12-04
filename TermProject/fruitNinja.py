@@ -5,8 +5,6 @@ from PIL import Image
 import math
 import random
 
-#High Score list
-
 def getHandPosition(app):
     __, image = app.video.read()
     imageRGB = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -24,7 +22,6 @@ def getHandPosition(app):
                             app.mouseX, app.mouseY = (cx, cy)
                     else:
                         app.mouseX2, app.mouseY2 = (1.3*cx, cy)
-
 
 class Button:
     def __init__(self, centerX, centerY, width, height, fillColor, textColor, text, textSize):
@@ -48,7 +45,6 @@ class Button:
             and (app.mouseY < self.centerY + self.height//2 + self.height//2) and (app.mouseY > self.centerY - self.height//2 and self.height//2): 
                 return True
         
-
 class Game:
     def __init__(self, app, lives, showTime, timeLimit, difficultyLevel):
         app.score = 0
@@ -110,6 +106,8 @@ class Game:
                     and app.mouseY < fruit.yPosition + 100 and app.mouseY > fruit.yPosition:
                     if fruit.fruit == "bomb" and app.score != 0:
                         app.score -= app.additionalPoints
+                    elif fruit.fruit == "bomb" and app.score == 0:
+                        app.score = 0
                     elif app.mouseX < fruit.xPosition + 60 and app.mouseX > fruit.xPosition + 40\
                         or app.mouseY < fruit.yPosition + 40  and app.mouseY > fruit.yPosition + 60:
                             app.score += app.additionalPoints + 15
@@ -123,6 +121,8 @@ class Game:
                     and app.mouseY2 < fruit.yPosition + 100 and app.mouseY2 > fruit.yPosition:
                     if fruit.fruit == "bomb" and app.score2 != 0:
                         app.score2 -= app.additionalPoints
+                    elif fruit.fruit == "bomb" and app.score2 == 0:
+                        app.score2 = 0
                     elif app.mouseX2 < fruit.xPosition + 60 and app.mouseX2 > fruit.xPosition + 40\
                         or app.mouseY2 < fruit.yPosition + 40  and app.mouseY2 > fruit.yPosition + 60:
                             app.score2 += app.additionalPoints + 15
@@ -168,8 +168,7 @@ class Fruit:
         elif self.fruit == "watermelon":
             return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/fruitImages/watermelon.png").resize((100, 100))
         elif self.fruit == "bomb":
-            return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/bomb.png").resize((100, 100))
-        
+            return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/bomb.png").resize((100, 100))       
     
 class screen:
     def getBackground():
@@ -283,13 +282,18 @@ class screen:
         drawLabel("Red Score: " + str(app.score2), app.width//2, app.height//2 + 100, fill = "white", font = "montserrat", size = 70)
         app.resetButton.getButton()
 
-
     def drawHighScore(app, board):
         drawImage(CMUImage(board.getBackground()), 0, 0, width = app.width, height = app.height)
         drawImage(CMUImage(board.getLogo()), app.width//2 - 350, app.height//3 -150)
         app.goBackToSelectScreen.getButton()
 
+        drawLabel("Mouse High Scores", 350, app.height//3, fill = "white", font = "montserrat", size = 50)
+        for i in range(len(app.highScores[0])//2):
+            drawLabel(str(i+1) + ". " + app.highScores[0][i], 200, app.height//3 + 50 + (i * 50), fill = "white", font = "montserrat", size = 50)
 
+        drawLabel("Hand High Scores", app.width //2 + 325, app.height//3, fill = "white", font = "montserrat", size = 50)
+        for i in range(len(app.highScores[0])//2, len(app.highScores[0])):
+            drawLabel(str(i-4) + ". " + app.highScores[0][i], app.width // 2 + 200, app.height//3 + 50 + ((i-5) * 50), fill = "white", font = "montserrat", size = 50)
 
 def onAppStart(app):
     app.mouseX = 0
@@ -353,6 +357,22 @@ def onAppStart(app):
     app.paused = False
     app.clearedBoard = 0
 
+    app.highScores = []
+    readHighScores(app)
+
+def readHighScores(app):
+    with open('/Users/saket/Documents/CMU/15112/15112TermProject/TermProject//highScores.txt', 'r') as file:
+        highScores = file.read()
+        app.highScores.append(highScores.split(","))
+    return highScores
+
+def writeHighScores(app):
+    with open('/Users/saket/Documents/CMU/15112/15112TermProject/TermProject//highScores.txt', 'w') as file:
+        for i in range(len(app.highScores[0])):
+            if i == len(app.highScores[0]) - 1:
+                file.write(app.highScores[0][i])
+            else:
+                file.write(app.highScores[0][i] + ",")
 
 def onStep(app):
     app.steps += 1
@@ -377,145 +397,16 @@ def onStep(app):
             app.hands = None
 
     if app.classicGameMode and not app.paused:
-        if app.steps % 30 == 0:
-            mins, secs = divmod(app.seconds, 60)
-            timeformat = '{:02d}:{:02d}'.format(mins, secs)
-            app.seconds -= 1
-            app.timer = timeformat
-        if app.seconds == 0:
-            app.paused = True
-            app.endGameScreen = True
-            app.classicGameMode = False
-        if app.steps % app.spawnsPerTick == 0:
-            for _ in range(app.numOfSpawns):
-                Game.spawnFruit(app)
-        Game.checkCollision(app) 
-
-        if app.lives == 0:
-            app.paused = True
-            app.endGameScreen = True
-            app.classicGameMode = False
-
-        if app.score < 100:
-            app.spawnsPerTick = 40
-            app.difficultyLevel = "Easy"
-            app.numOfSpawns = 1
-            app.additonalPoints = 5
-        elif app.score < 300:
-            app.spawnsPerTick = 40
-            app.difficultyLevel = "Medium"
-            app.numOfSpawns = 2
-            app.additonalPoints = 10
-        elif app.score < 700:
-            app.spawnsPerTick = 30
-            app.difficultyLevel = "Hard"
-            app.numOfSpawns = 3
-            app.additionalPoints = 12
-        elif app.score < 1200:
-            app.spawnsPerTick = 30
-            app.difficultyLevel = "Insane"
-            app.numOfSpawns = 4
-            app.additionalPoints = 18
-        elif app.score < 1800:
-            app.spawnsPerTick = 20
-            app.difficultyLevel = "Impossible"
-            app.numOfSpawns = 5
-            app.additionalPoints = 22
-        elif app.score < 3000:
-            app.spawnsPerTick = 10
-            app.difficultyLevel = "God Mode"
-            app.numOfSpawns = 6
-            app.additionalPoints = 26
+        classicGameMode(app)
 
     if app.arcadeGameMode and not app.paused:
-        if app.steps % 30 == 0:
-            mins, secs = divmod(app.seconds, 60)
-            timeformat = '{:02d}:{:02d}'.format(mins, secs)
-            app.seconds -= 1
-            app.timer = timeformat
-        if app.seconds == 0:
-            app.paused = True
-            app.endGameScreen = True
-            app.arcadeGameMode = False
-        if app.steps % app.spawnsPerTick == 0:
-            for _ in range(app.numOfSpawns):
-                Game.spawnFruit(app)
-        Game.checkCollision(app) 
-
-        if app.lives == 0:
-            app.paused = True
-            app.endGameScreen = True
-            app.arcadeGameMode = False
-
-        
-        if app.score < 100:
-            app.spawnsPerTick = 40
-            app.difficultyLevel = "Easy"
-            app.numOfSpawns = 1
-            app.additonalPoints = 5
-        elif app.score < 300:
-            app.spawnsPerTick = 40
-            app.difficultyLevel = "Medium"
-            app.numOfSpawns = 2
-            app.additonalPoints = 10
-        elif app.score < 700:
-            app.spawnsPerTick = 30
-            app.difficultyLevel = "Hard"
-            app.numOfSpawns = 3
-            app.additionalPoints = 12
-        elif app.score < 1200:
-            app.spawnsPerTick = 30
-            app.difficultyLevel = "Insane"
-            app.numOfSpawns = 4
-            app.additionalPoints = 18
-        elif app.score < 1800:
-            app.spawnsPerTick = 20
-            app.difficultyLevel = "Impossible"
-            app.numOfSpawns = 5
-            app.additionalPoints = 22
-        elif app.score < 3000:
-            app.spawnsPerTick = 10
-            app.difficultyLevel = "God Mode"
-            app.numOfSpawns = 6
-            app.additionalPoints = 26
+        arcadeGameMode(app)
 
     if app.zenGameMode and not app.paused:
-        if app.steps % app.spawnsPerTick == 0:
-            for _ in range(app.numOfSpawns):
-                Game.spawnFruit(app)
-        Game.checkCollision(app) 
-
-        if app.lives == 0:
-            app.paused = True
-            app.endGameScreen = True
-            app.zenGameMode = False
-    
-        app.spawnsPerTick = 40
-        app.difficultyLevel = "ZEN"
-        app.numOfSpawns = 2
-        app.additonalPoints = 10
+        zenGameMode(app)
 
     if app.multiplayerGameMode and not app.paused:
-        if app.steps % 30 == 0:
-            mins, secs = divmod(app.seconds, 60)
-            timeformat = '{:02d}:{:02d}'.format(mins, secs)
-            app.seconds -= 1
-            app.timer = timeformat
-        if app.seconds == 0:
-            app.paused = True
-            app.endMultiGameMode = True
-            app.multiplayerGameMode = False
-
-        if app.steps % app.spawnsPerTick == 0:
-            for _ in range(app.numOfSpawns):
-                Game.spawnFruit(app)
-        Game.checkCollision(app) 
-    
-        app.spawnsPerTick = 40
-        app.difficultyLevel = ""
-        app.numOfSpawns = 2
-        app.additonalPoints = 10
-
+        multiGameMode(app)
 
 def onMousePress(app, mouseX, mouseY):
     (app.mouseX, app.mouseY) = (mouseX, mouseY)
@@ -534,7 +425,7 @@ def onMousePress(app, mouseX, mouseY):
     elif app.classicButton.isClicked(app) and app.showSelectScreen:
         app.showSelectScreen = False
         app.classicGameMode = True
-        Game(app, 3, True, 90, "Easy")
+        Game(app, 3, True, 10, "Easy")
 
     elif app.showHighScores.isClicked(app) and app.showSelectScreen:
         app.showSelectScreen = False
@@ -563,6 +454,7 @@ def onMousePress(app, mouseX, mouseY):
         app.endGameScreen = False
         app.classicGameMode = False
         app.showSelectScreen = False
+        writeHighScores(app)
         onAppStart(app)
 
     elif app.quitGameButton.isClicked(app) and (app.classicGameMode or app.arcadeGameMode or app.zenGameMode or app.multiplayerGameMode) and app.paused:
@@ -580,15 +472,12 @@ def onMousePress(app, mouseX, mouseY):
             app.pausedFill = "gray"
             app.pausedOpacity = 0
 
-    
-
     elif app.goBackToSelectScreen.isClicked(app) and app.showHighScoreScreen:
         app.showHighScoreScreen = False
         app.showSelectScreen = True
 
 def onMouseDrag(app, mouseX, mouseY):
     (app.mouseX, app.mouseY) = (mouseX, mouseY)
-
 
 def redrawAll(app):
     if app.showSplashScreen:
@@ -609,6 +498,166 @@ def redrawAll(app):
         screen.drawHighScore(app, screen)
     elif app.endMultiGameMode:
         screen.drawMultiAppEndScreen(app, screen)
+
+def classicGameMode(app):
+    dead = False
+    if app.steps % 30 == 0:
+        mins, secs = divmod(app.seconds, 60)
+        timeformat = '{:02d}:{:02d}'.format(mins, secs)
+        app.seconds -= 1
+        app.timer = timeformat
+    if app.seconds == 0:
+        app.paused = True
+        app.endGameScreen = True
+        app.classicGameMode = False
+        dead = True
+
+    if app.steps % app.spawnsPerTick == 0:
+        for _ in range(app.numOfSpawns):
+            Game.spawnFruit(app)
+    Game.checkCollision(app) 
+
+    if app.lives == 0:
+        app.paused = True
+        app.endGameScreen = True
+        app.classicGameMode = False
+        dead = True
+
+    if app.score < 100:
+        app.spawnsPerTick = 40
+        app.difficultyLevel = "Easy"
+        app.numOfSpawns = 1
+        app.additonalPoints = 5
+    elif app.score < 300:
+        app.spawnsPerTick = 40
+        app.difficultyLevel = "Medium"
+        app.numOfSpawns = 2
+        app.additonalPoints = 10
+    elif app.score < 700:
+        app.spawnsPerTick = 30
+        app.difficultyLevel = "Hard"
+        app.numOfSpawns = 3
+        app.additionalPoints = 12
+    elif app.score < 1200:
+        app.spawnsPerTick = 30
+        app.difficultyLevel = "Insane"
+        app.numOfSpawns = 4
+        app.additionalPoints = 18
+    elif app.score < 1800:
+        app.spawnsPerTick = 20
+        app.difficultyLevel = "Impossible"
+        app.numOfSpawns = 5
+        app.additionalPoints = 22
+    elif app.score < 3000:
+        app.spawnsPerTick = 10
+        app.difficultyLevel = "God Mode"
+        app.numOfSpawns = 6
+        app.additionalPoints = 26
+
+    if dead:
+        if not app.useHands:
+            for i in range(len(app.highScores[0])//2):
+                if app.score > int(app.highScores[0][i]):
+                    for j in range(len(app.highScores[0])//2, i+1, -1):
+                        app.highScores[0][j] = str(int(app.highScores[0][j-1]))
+                    app.highScores[0][i] = str(app.score)
+                    break
+        else:
+            for i in range(len(app.highScores[0])//2, len(app.highScores[0])):
+                if app.score > int(app.highScores[0][i]):
+                    for j in range(len(app.highScores[0]), i+1, -1):
+                        app.highScores[0][j] = str(int(app.highScores[0][j-1]))
+                    app.highScores[0][i] = str(app.score)
+                    break
+
+def arcadeGameMode(app):
+    if app.steps % 30 == 0:
+        mins, secs = divmod(app.seconds, 60)
+        timeformat = '{:02d}:{:02d}'.format(mins, secs)
+        app.seconds -= 1
+        app.timer = timeformat
+    if app.seconds == 0:
+        app.paused = True
+        app.endGameScreen = True
+        app.arcadeGameMode = False
+    if app.steps % app.spawnsPerTick == 0:
+        for _ in range(app.numOfSpawns):
+            Game.spawnFruit(app)
+    Game.checkCollision(app) 
+
+    if app.lives == 0:
+        app.paused = True
+        app.endGameScreen = True
+        app.arcadeGameMode = False
+
+    
+    if app.score < 100:
+        app.spawnsPerTick = 40
+        app.difficultyLevel = "Easy"
+        app.numOfSpawns = 1
+        app.additonalPoints = 5
+    elif app.score < 300:
+        app.spawnsPerTick = 40
+        app.difficultyLevel = "Medium"
+        app.numOfSpawns = 2
+        app.additonalPoints = 10
+    elif app.score < 700:
+        app.spawnsPerTick = 30
+        app.difficultyLevel = "Hard"
+        app.numOfSpawns = 3
+        app.additionalPoints = 12
+    elif app.score < 1200:
+        app.spawnsPerTick = 30
+        app.difficultyLevel = "Insane"
+        app.numOfSpawns = 4
+        app.additionalPoints = 18
+    elif app.score < 1800:
+        app.spawnsPerTick = 20
+        app.difficultyLevel = "Impossible"
+        app.numOfSpawns = 5
+        app.additionalPoints = 22
+    elif app.score < 3000:
+        app.spawnsPerTick = 10
+        app.difficultyLevel = "God Mode"
+        app.numOfSpawns = 6
+        app.additionalPoints = 26
+
+def zenGameMode(app):
+    if app.steps % app.spawnsPerTick == 0:
+        for _ in range(app.numOfSpawns):
+            Game.spawnFruit(app)
+    Game.checkCollision(app) 
+
+    if app.lives == 0:
+        app.paused = True
+        app.endGameScreen = True
+        app.zenGameMode = False
+
+    app.spawnsPerTick = 40
+    app.difficultyLevel = "ZEN"
+    app.numOfSpawns = 2
+    app.additonalPoints = 10
+
+def multiGameMode(app):
+    if app.steps % 30 == 0:
+        mins, secs = divmod(app.seconds, 60)
+        timeformat = '{:02d}:{:02d}'.format(mins, secs)
+        app.seconds -= 1
+        app.timer = timeformat
+    if app.seconds == 0:
+        app.paused = True
+        app.endMultiGameMode = True
+        app.multiplayerGameMode = False
+
+    if app.steps % app.spawnsPerTick == 0:
+        for _ in range(app.numOfSpawns):
+            Game.spawnFruit(app)
+    Game.checkCollision(app) 
+
+    app.spawnsPerTick = 40
+    app.difficultyLevel = ""
+    app.numOfSpawns = 2
+    app.additonalPoints = 10
 
 def main():
     runApp(1200, 600)
