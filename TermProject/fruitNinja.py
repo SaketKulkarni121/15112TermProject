@@ -18,9 +18,12 @@ def getHandPosition(app):
                 if id == 8:
                     cx, cy = app.width -  int(landmark.x * app.width), int(landmark.y * app.height)
                     if handNum == 0:
-                        app.mouseX, app.mouseY = (cx, cy)
+                        if app.multiplayerGameMode:
+                            app.mouseX, app.mouseY = (1.3*cx, cy)
+                        else:
+                            app.mouseX, app.mouseY = (cx, cy)
                     else:
-                        app.mouseX2, app.mouseY2 = (cx, cy)
+                        app.mouseX2, app.mouseY2 = (1.3*cx, cy)
 
 
 class Button:
@@ -71,21 +74,43 @@ class Game:
             drawImage(CMUImage(fruit.getFruit()), px, py)
 
     def checkCollision(app):
-        for fruit in app.fruits:
-            if fruit.yPosition > app.height:
-                app.fruits.remove(fruit)
-                if fruit.fruit != "bomb":
-                    app.lives -= 1
-            elif fruit.xPosition < 0 or fruit.xPosition > app.width:
-                app.fruits.remove(fruit)
-                if fruit.fruit != "bomb":
-                    app.lives -= 1
-            elif app.mouseX < fruit.xPosition + 100 and app.mouseX > fruit.xPosition\
-                and app.mouseY < fruit.yPosition + 100 and app.mouseY > fruit.yPosition:
-                if fruit.fruit == "bomb":
-                    app.lives -= 1
-                else:
-                    if app.mouseX < fruit.xPosition + 60 and app.mouseX > fruit.xPosition + 40\
+        if not app.multiplayerGameMode:
+            for fruit in app.fruits:
+                if fruit.yPosition > app.height:
+                    app.fruits.remove(fruit)
+                    if fruit.fruit != "bomb":
+                        app.lives -= 1
+                elif fruit.xPosition < 0 or fruit.xPosition > app.width:
+                    app.fruits.remove(fruit)
+                    if fruit.fruit != "bomb":
+                        app.lives -= 1
+                elif app.mouseX < fruit.xPosition + 100 and app.mouseX > fruit.xPosition\
+                    and app.mouseY < fruit.yPosition + 100 and app.mouseY > fruit.yPosition:
+                    if fruit.fruit == "bomb":
+                        app.lives -= 1
+                    else:
+                        if app.mouseX < fruit.xPosition + 60 and app.mouseX > fruit.xPosition + 40\
+                            or app.mouseY < fruit.yPosition + 40  and app.mouseY > fruit.yPosition + 60:
+                                app.score += app.additionalPoints + 15
+                        elif app.mouseX < fruit.xPosition + 80 and app.mouseX > fruit.xPosition + 20\
+                            or app.mouseY < fruit.yPosition + 40  and app.mouseY > fruit.yPosition + 60:
+                                app.score += app.additionalPoints + 10
+                        else:
+                            app.score += app.additionalPoints
+                        if app.arcadeGameMode:
+                            app.seconds += 1
+                    app.fruits.remove(fruit)
+        else:
+            for fruit in app.fruits:
+                if fruit.yPosition > app.height:
+                    app.fruits.remove(fruit)
+                elif fruit.xPosition < 0 or fruit.xPosition > app.width:
+                    app.fruits.remove(fruit)
+                elif app.mouseX < fruit.xPosition + 100 and app.mouseX > fruit.xPosition\
+                    and app.mouseY < fruit.yPosition + 100 and app.mouseY > fruit.yPosition:
+                    if fruit.fruit == "bomb" and app.score != 0:
+                        app.score -= app.additionalPoints
+                    elif app.mouseX < fruit.xPosition + 60 and app.mouseX > fruit.xPosition + 40\
                         or app.mouseY < fruit.yPosition + 40  and app.mouseY > fruit.yPosition + 60:
                             app.score += app.additionalPoints + 15
                     elif app.mouseX < fruit.xPosition + 80 and app.mouseX > fruit.xPosition + 20\
@@ -93,9 +118,20 @@ class Game:
                             app.score += app.additionalPoints + 10
                     else:
                         app.score += app.additionalPoints
-                    if app.arcadeGameMode:
-                        app.seconds += 1
-                app.fruits.remove(fruit)
+                    app.fruits.remove(fruit)
+                elif app.mouseX2 < fruit.xPosition + 100 and app.mouseX2 > fruit.xPosition\
+                    and app.mouseY2 < fruit.yPosition + 100 and app.mouseY2 > fruit.yPosition:
+                    if fruit.fruit == "bomb" and app.score2 != 0:
+                        app.score2 -= app.additionalPoints
+                    elif app.mouseX2 < fruit.xPosition + 60 and app.mouseX2 > fruit.xPosition + 40\
+                        or app.mouseY2 < fruit.yPosition + 40  and app.mouseY2 > fruit.yPosition + 60:
+                            app.score2 += app.additionalPoints + 15
+                    elif app.mouseX2 < fruit.xPosition + 80 and app.mouseX2 > fruit.xPosition + 20\
+                        or app.mouseY2 < fruit.yPosition + 40  and app.mouseY2 > fruit.yPosition + 60:
+                            app.score2 += app.additionalPoints + 10
+                    else:
+                        app.score2 += app.additionalPoints
+                    app.fruits.remove(fruit)
             
 class Fruit:
     def __init__(self, app, fruit, startXPos, speed, angle):
@@ -146,6 +182,9 @@ class screen:
     def getScore():
         return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/score.png").resize((100, 50), Image.BICUBIC)
     
+    def getScore2():
+        return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/score2.png").resize((100, 50), Image.BICUBIC)
+
     def getEmptyCross():
         return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/emptyCross.png").resize((65, 50), Image.BICUBIC)
 
@@ -181,9 +220,6 @@ class screen:
         app.pauseGameButton.fillColor = app.pausedFill
         app.pauseGameButton.getButton()
         drawCircle(app.mouseX, app.mouseY, 15, fill = "blue")
-        if app.multiplayerGameMode:
-            drawCircle(app.mouseX2, app.mouseY2, 15, fill = "red")
-
         drawLabel(app.score, 200, 25, fill = "white", font = "montserrat", size = 70)
         if app.lives == 0:
             drawImage(CMUImage(board.getFullCross()), app.width - 50, 0)
@@ -207,6 +243,30 @@ class screen:
 
         if app.showTimer:
             drawLabel(app.timer, app.width//2, 25, fill = "white", font = "montserrat", size = 70)
+    
+    def drawMultiModeScreen(app, board):
+        drawImage(CMUImage(board.getBackground()), 0, 0, width = app.width, height = app.height)
+        drawImage(CMUImage(board.getScore()), 0, 0)
+        drawImage(CMUImage(board.getScore2()), app.width - 300, 0)
+
+        drawLabel(app.difficultyLevel, app.width//3, 25, fill = "white", font = "montserrat", size = 50)
+        drawRect(0, 0, app.width, app.height, fill = "black", opacity = app.pausedOpacity)
+
+        if app.pausedOpacity == 50:
+            app.quitGameButton.getButton()
+        
+        app.pauseGameButton.fillColor = app.pausedFill
+        app.pauseGameButton.getButton()
+        drawCircle(app.mouseX, app.mouseY, 15, fill = "blue")
+        drawCircle(app.mouseX2, app.mouseY2, 15, fill = "red")
+
+        drawLabel(app.score, 200, 25, fill = "white", font = "montserrat", size = 70)
+        drawLabel(app.score2, app.width - 100, 25, fill = "white", font = "montserrat", size = 70)
+        if not app.paused:
+            Game.moveFruit(app)     
+
+        if app.showTimer:
+            drawLabel(app.timer, app.width//2, 25, fill = "white", font = "montserrat", size = 70)
 
     def drawAppEndScreen(app, board):
         drawImage(CMUImage(board.getBackground()), 0, 0, width = app.width, height = app.height)
@@ -214,6 +274,15 @@ class screen:
         drawLabel("Game Over", app.width//2, app.height//2, fill = "white", font = "montserrat", size = 70)
         drawLabel("Score: " + str(app.score), app.width//2, app.height//2 + 100, fill = "white", font = "montserrat", size = 70)
         app.resetButton.getButton()
+
+    def drawMultiAppEndScreen(app, board):
+        drawImage(CMUImage(board.getBackground()), 0, 0, width = app.width, height = app.height)
+        drawImage(CMUImage(board.getLogo()), app.width//2 - 350, app.height//2 -250)
+        drawLabel("Game Over", app.width//2, app.height//2 -100, fill = "white", font = "montserrat", size = 70)
+        drawLabel("Blue Score: " + str(app.score), app.width//2, app.height//2, fill = "white", font = "montserrat", size = 70)
+        drawLabel("Red Score: " + str(app.score2), app.width//2, app.height//2 + 100, fill = "white", font = "montserrat", size = 70)
+        app.resetButton.getButton()
+
 
     def drawHighScore(app, board):
         drawImage(CMUImage(board.getBackground()), 0, 0, width = app.width, height = app.height)
@@ -260,6 +329,7 @@ def onAppStart(app):
     app.quitGameButton = Button(app.width//2, app.height//2, 50, 50, "gray","white", "Quit", 30)
 
     app.score = 0
+    app.score2 = 0
     app.lives = 3
     app.difficultyLevel = "Easy"
 
@@ -366,7 +436,7 @@ def onStep(app):
         if app.seconds == 0:
             app.paused = True
             app.endGameScreen = True
-            app.classicGameMode = False
+            app.arcadeGameMode = False
         if app.steps % app.spawnsPerTick == 0:
             for _ in range(app.numOfSpawns):
                 Game.spawnFruit(app)
@@ -425,6 +495,27 @@ def onStep(app):
         app.numOfSpawns = 2
         app.additonalPoints = 10
 
+    if app.multiplayerGameMode and not app.paused:
+        if app.steps % 30 == 0:
+            mins, secs = divmod(app.seconds, 60)
+            timeformat = '{:02d}:{:02d}'.format(mins, secs)
+            app.seconds -= 1
+            app.timer = timeformat
+        if app.seconds == 0:
+            app.paused = True
+            app.endMultiGameMode = True
+            app.multiplayerGameMode = False
+
+        if app.steps % app.spawnsPerTick == 0:
+            for _ in range(app.numOfSpawns):
+                Game.spawnFruit(app)
+        Game.checkCollision(app) 
+    
+        app.spawnsPerTick = 40
+        app.difficultyLevel = ""
+        app.numOfSpawns = 2
+        app.additonalPoints = 10
+
 
 def onMousePress(app, mouseX, mouseY):
     (app.mouseX, app.mouseY) = (mouseX, mouseY)
@@ -463,22 +554,24 @@ def onMousePress(app, mouseX, mouseY):
     elif app.multiplayerButton.isClicked(app) and app.showSelectScreen:
         app.showSelectScreen = False
         app.multiplayerGameMode = True
-        Game(app, 3, True, 90, "Easy")
 
-    elif app.resetButton.isClicked(app) and app.endGameScreen:
+        app.useHands = True
+        Game(app, 3, True, 40, "Easy")
+
+    elif app.resetButton.isClicked(app) and (app.endGameScreen or app.endMultiGameMode):
         app.showSplashScreen = True
         app.endGameScreen = False
         app.classicGameMode = False
         app.showSelectScreen = False
         onAppStart(app)
 
-    elif app.quitGameButton.isClicked(app) and app.classicGameMode and app.paused:
+    elif app.quitGameButton.isClicked(app) and (app.classicGameMode or app.arcadeGameMode or app.zenGameMode or app.multiplayerGameMode) and app.paused:
         app.showSplashScreen = True
         app.classicGameMode = False
         app.showSelectScreen = False
         onAppStart(app)
 
-    elif app.pauseGameButton.isClicked(app) and app.classicGameMode:
+    elif app.pauseGameButton.isClicked(app) and (app.classicGameMode or app.arcadeGameMode or app.zenGameMode or app.multiplayerGameMode):
         app.paused = not app.paused
         if app.paused:
             app.pausedFill = "green"
@@ -511,9 +604,11 @@ def redrawAll(app):
     elif app.endGameScreen:
         screen.drawAppEndScreen(app, screen)
     elif app.multiplayerGameMode:
-        screen.drawClassicModeScreen(app, screen)
+        screen.drawMultiModeScreen(app, screen)
     elif app.showHighScoreScreen:
         screen.drawHighScore(app, screen)
+    elif app.endMultiGameMode:
+        screen.drawMultiAppEndScreen(app, screen)
 
 def main():
     runApp(1200, 600)
