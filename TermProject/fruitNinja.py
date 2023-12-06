@@ -4,6 +4,9 @@ import mediapipe
 from PIL import Image
 import math
 import random
+import os
+
+path = os.getcwd() + "/TermProject"
 
 def getHandPosition(app):
     __, image = app.video.read()
@@ -150,45 +153,62 @@ class Fruit:
         self.speed -= 0.5 * self.weight
         return self.xPosition, self.yPosition
 
+    #To remove background: remove.bg
     def getFruit(self):
         if self.fruit == "apple":
-            return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/fruitImages/apple.png").resize((75, 75))
+            #Apple Image Citation: https://www.google.com/imgres?imgurl=https%3A%2F%2Fstatic-00.iconduck.com%2Fassets.00%2Fred-apple-emoji-1779x2048-aklr8hg9.png&tbnid=FNfj7qcqOKlpuM&vet=12ahUKEwj0wOCb_OqCAxU6M1kFHYpJCTcQMygEegQIARBm..i&imgrefurl=https%3A%2F%2Ficonduck.com%2Femojis%2F36145%2Fred-apple&docid=8hNCFk2muC1EjM&w=1779&h=2048&q=apple%20fruit%20emojis&ved=2ahUKEwj0wOCb_OqCAxU6M1kFHYpJCTcQMygEegQIARBm
+            return Image.open(path + "/images/fruitImages/apple.png").resize((75, 75))
         elif self.fruit == "banana":
-            return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/fruitImages/banana.png").resize((100, 100))
+            #Banana Image Citation: https://www.google.com/imgres?imgurl=https%3A%2F%2Fcdn4.vectorstock.com%2Fi%2F1000x1000%2F34%2F63%2Fsticker-not-peeled-banana-vector-33023463.jpg&tbnid=9DbTDutcbfagkM&vet=12ahUKEwjzzq2g_uqCAxVUIWIAHU_sDIUQMygAegQIARBX..i&imgrefurl=https%3A%2F%2Fwww.vectorstock.com%2Froyalty-free-vector%2Fsticker-not-peeled-banana-vector-33023463&docid=wpwgt-A5egh5GM&w=1000&h=1080&q=single%20not%20peeled%20banana%20emoji&ved=2ahUKEwjzzq2g_uqCAxVUIWIAHU_sDIUQMygAegQIARBX
+            return Image.open(path + "/images/fruitImages/banana.png").resize((100, 100))
         elif self.fruit == "coconut":
-            return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/fruitImages/coconut.png").resize((100, 100))
+            #Coconut Image Citation: https://www.google.com/imgres?imgurl=https%3A%2F%2Fimages-wixmp-ed30a86b8c4ca887773594c2.wixmp.com%2Ff%2F502fff8b-d4da-4fe3-9ea0-c48cee978d98%2Fda0tne9-be718abe-46fd-424a-a7c5-d1ac84dbc593.jpg%3Ftoken%3DeyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzUwMmZmZjhiLWQ0ZGEtNGZlMy05ZWEwLWM0OGNlZTk3OGQ5OFwvZGEwdG5lOS1iZTcxOGFiZS00NmZkLTQyNGEtYTdjNS1kMWFjODRkYmM1OTMuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.ixTRNb9rtiPCE8TSEcH5OG9oJC25Zt6yI8igsBD1uSY&tbnid=IGRetm_UNAgkDM&vet=12ahUKEwiRm9nE_uqCAxWgAWIAHcCqC9IQMygXegUIARCJAQ..i&imgrefurl=https%3A%2F%2Fwww.deviantart.com%2Ftulacoe%2Fart%2Fcoconut-606045105&docid=i_3TxW9j-SDPeM&w=800&h=800&itg=1&q=full%20coconut%20emoji&ved=2ahUKEwiRm9nE_uqCAxWgAWIAHcCqC9IQMygXegUIARCJAQ
+            return Image.open(path + "/images/fruitImages/coconut.png").resize((100, 100))
         elif self.fruit == "kiwi":
-            return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/fruitImages/kiwi.png").resize((60, 60))
+            #Kiwi Image Citation: https://www.google.com/imgres?imgurl=https%3A%2F%2Fcdn.create.vista.com%2Fapi%2Fmedia%2Fsmall%2F2664108%2Fstock-vector-kiwi&tbnid=UqTH0_4FCZZj5M&vet=10CLQBEDMosAFqFwoTCOjZkYb_6oIDFQAAAAAdAAAAABAC..i&imgrefurl=https%3A%2F%2Fcreate.vista.com%2Fvectors%2Fkiwi%2F&docid=xB9qCZ6XusaLRM&w=470&h=608&q=kiwi%20image%20emoji&ved=0CLQBEDMosAFqFwoTCOjZkYb_6oIDFQAAAAAdAAAAABAC
+            return Image.open(path + "/images/fruitImages/kiwi.png").resize((60, 60))
         elif self.fruit == "mango":
-            return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/fruitImages/mango.png").resize((75, 75))
+            #Mango Image Citation: https://www.google.com/imgres?imgurl=https%3A%2F%2Fcreazilla-store.fra1.digitaloceanspaces.com%2Femojis%2F57396%2Fmango-emoji-clipart-md.png&tbnid=wvHuoZQrLJeV7M&vet=12ahUKEwjp-ba4_-qCAxXLMmIAHRTgCIwQMygHegQIARBg..i&imgrefurl=https%3A%2F%2Fcreazilla.com%2Fnodes%2F57396-mango-emoji-clipart&docid=1RFQ9SavEtOwmM&w=800&h=800&q=mango%20apple%20emoji&ved=2ahUKEwjp-ba4_-qCAxXLMmIAHRTgCIwQMygHegQIARBg
+            return Image.open(path + "/images/fruitImages/mango.png").resize((75, 75))
         elif self.fruit == "pineapple":
-            return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/fruitImages/pineapple.png").resize((100, 100))
+            #Pineapple Image Citation: https://www.google.com/imgres?imgurl=https%3A%2F%2Fem-content.zobj.net%2Fsource%2Fgoogle%2F110%2Fpineapple_1f34d.png&tbnid=arKM-XuDqZg1UM&vet=12ahUKEwiqx-Tu_-qCAxUHFlkFHQ3nAssQMygDegQIARBW..i&imgrefurl=https%3A%2F%2Femojipedia.org%2Fgoogle%2Fandroid-8.0%2Fpineapple&docid=fgaZ1Dt7DzHSmM&w=512&h=512&itg=1&q=pineapple%20google%20phone%20emoji&ved=2ahUKEwiqx-Tu_-qCAxUHFlkFHQ3nAssQMygDegQIARBW
+            return Image.open(path + "/images/fruitImages/pineapple.png").resize((100, 100))
         elif self.fruit == "strawberry":
-            return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/fruitImages/strawberry.png").resize((50, 50))
+            #Strawberry Image Citation: https://www.google.com/imgres?imgurl=https%3A%2F%2Fstatic-00.iconduck.com%2Fassets.00%2Fstrawberry-emoji-1926x2048-8u86jln8.png&tbnid=MRafJSaL8d54ZM&vet=12ahUKEwi9zeyKgOuCAxUsIWIAHUjPCnYQMygBegQIARBT..i&imgrefurl=https%3A%2F%2Ficonduck.com%2Femojis%2F36150%2Fstrawberry&docid=tKvSOOD89WtyBM&w=1926&h=2048&q=strawberry%20apple%20emoji&ved=2ahUKEwi9zeyKgOuCAxUsIWIAHUjPCnYQMygBegQIARBT
+            return Image.open(path + "/images/fruitImages/strawberry.png").resize((50, 50))
         elif self.fruit == "watermelon":
-            return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/fruitImages/watermelon.png").resize((100, 100))
+            #Watermelon Image Citation: https://www.google.com/imgres?imgurl=https%3A%2F%2Fimage.emojipng.com%2F68%2F12039068.jpg&tbnid=flPR6TXt_GJnNM&vet=12ahUKEwjJsviagOuCAxXrF2IAHSTyAnwQMygmegUIARC0AQ..i&imgrefurl=https%3A%2F%2Fwww.emojipng.com%2Fpreview%2F12039068&docid=_LcbEOUmLjAtsM&w=900&h=899&q=full%20watermelon%20emoji&ved=2ahUKEwjJsviagOuCAxXrF2IAHSTyAnwQMygmegUIARC0AQ
+            return Image.open(path + "/images/fruitImages/watermelon.png").resize((100, 100))
         elif self.fruit == "bomb":
-            return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/bomb.png").resize((100, 100))       
+            #Bomb Image Citation: https://www.google.com/imgres?imgurl=https%3A%2F%2Fimage.pngaaa.com%2F746%2F5079746-middle.png&tbnid=N_GEsi40OV2lKM&vet=12ahUKEwjErrnAgOuCAxWfFmIAHRSHDdoQMygIegQIARBi..i&imgrefurl=https%3A%2F%2Fwww.pngaaa.com%2Fdetail%2F5079746&docid=Ugg_aNTyaCnQuM&w=900&h=617&q=bomb%20fruit%20ninja%20png&ved=2ahUKEwjErrnAgOuCAxWfFmIAHRSHDdoQMygIegQIARBi
+            return Image.open(path + "/images/bomb.png").resize((100, 100))       
     
 class screen:
+    #To remove background: remove.bg
     def getBackground():
-        return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject//images/background.png")
+        #Background Image Citation: https://www.google.com/url?sa=i&url=https%3A%2F%2Freplit.com%2F%40willverrinder%2FFruitNinja&psig=AOvVaw3HFkla36DRKMwYQ57kw9OG&ust=1701408946700000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCMDA9bCA64IDFQAAAAAdAAAAABAD
+        return Image.open(path + "/images/background.png")
     
     def getLogo():
-        img = Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/logo.png")
+        #Fruit Ninja Font: https://fontmeme.com/fruit-ninja-font/#google_vignette 
+        img = Image.open(path + "/images/logo.png")
         return img.resize((700, 120), Image.BICUBIC)
     
     def getScore():
-        return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/score.png").resize((100, 50), Image.BICUBIC)
+        #Fruit Ninja Font: https://fontmeme.com/fruit-ninja-font/#google_vignette 
+        return Image.open(path + "/images/score.png").resize((100, 50), Image.BICUBIC)
     
     def getScore2():
-        return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/score2.png").resize((100, 50), Image.BICUBIC)
+        #Fruit Ninja Font: https://fontmeme.com/fruit-ninja-font/#google_vignette 
+        return Image.open(path + "/images/score2.png").resize((100, 50), Image.BICUBIC)
 
     def getEmptyCross():
-        return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/emptyCross.png").resize((65, 50), Image.BICUBIC)
+        #Empty Cross and Filled Cross Image was made in Google Drawings
+        return Image.open(path + "/images/emptyCross.png").resize((65, 50), Image.BICUBIC)
 
     def getFullCross():
-        return Image.open("/Users/saket/Documents/CMU/15112/15112TermProject/TermProject/images/fullCross.png").resize((65, 50), Image.BICUBIC)
+        #Empty Cross and Filled Cross Image was made in Google Drawings
+        return Image.open(path + "/images/fullCross.png").resize((65, 50), Image.BICUBIC)
 
     def drawSplashScreen(app, board):
         drawImage(CMUImage(board.getBackground()), 0, 0, width = app.width, height = app.height)
@@ -295,6 +315,20 @@ class screen:
         for i in range(len(app.highScores[0])//2, len(app.highScores[0])):
             drawLabel(str(i-4) + ". " + app.highScores[0][i], app.width // 2 + 200, app.height//3 + 50 + ((i-5) * 50), fill = "white", font = "montserrat", size = 50)
 
+    def drawInstructions(app, board):
+        drawImage(CMUImage(board.getBackground()), 0, 0, width = app.width, height = app.height)
+        drawImage(CMUImage(board.getLogo()), app.width//2 - 350, app.height//3 -150)
+        app.continueButton.getButton()
+
+        drawLabel("Instructions", app.width//2, app.height//3, fill = "white", font = "montserrat", size = 50)
+        drawLabel("1. Choose whether to use cursor or hand to play", app.width//2, app.height//3 + 50, fill = "white", font = "montserrat", size = 38)
+        drawLabel("2. Choose a game mode", app.width//2, app.height//3 + 100, fill = "white", font = "montserrat", size = 38)
+        drawLabel("3. Hold and drag / move your hand slowly to hit the fruit", app.width//2, app.height//3 + 150, fill = "white", font = "montserrat", size = 38)
+        drawLabel("4. Don't let the fruit fall off the screen", app.width//2, app.height//3 + 200, fill = "white", font = "montserrat", size = 38)
+        drawLabel("5. Don't slice the bomb", app.width//2, app.height//3 + 250, fill = "white", font = "montserrat", size = 38)
+        drawLabel("6. Have fun!", app.width//2, app.height//3 + 300, fill = "white", font = "montserrat", size = 38)
+        drawLabel("Tip: While using hands, move hands around slowly and in frame", app.width//2, app.height//3 + 350, fill = "white", font = "montserrat", size = 38)
+
 def onAppStart(app):
     app.mouseX = 0
     app.mouseY = 0
@@ -302,6 +336,7 @@ def onAppStart(app):
     app.mouseY2 = 0
     app.showSplashScreen = True
     app.showSelectScreen = False
+    app.showInstructionScreen = False
 
     app.classicGameMode = False
     app.arcadeGameMode = False
@@ -311,6 +346,7 @@ def onAppStart(app):
     app.endGameScreen = False
     app.showHighScoreScreen = False
     app.gamePaused = False
+    app.endMultiGameMode = False
     
     app.pausedFill = "gray"
     app.pausedOpacity = 0
@@ -324,7 +360,7 @@ def onAppStart(app):
     app.multiplayerButton = Button(4 * app.width//5, app.height//2 , app.width//5 - 100, 50, "gray","white", "Multiplayer", 30)
     app.useHandsButton = Button(app.width//2, app.height//2 + 100, app.width//2 - 100, 50, app.usingHandsFill, "white", "Use Hands", 30)
     app.showHighScores = Button(app.width//2, app.height//2 + 175, app.width//2 - 100, 50, "gray","white", "High Scores", 30)
-
+    app.continueButton = Button(app.width - 100, 100, 50, 50, "gray","white", "=>", 30)
 
     app.resetButton = Button(app.width//2, app.height//2 + 200, app.width//2 - 100, 50, "gray","white", "Reset Game", 30)
     app.goBackToSelectScreen = Button(85, 50, 85, 50, "gray","white", "Go Back", 30)
@@ -413,6 +449,10 @@ def onMousePress(app, mouseX, mouseY):
 
     if app.startButton.isClicked(app) and app.showSplashScreen:
         app.showSplashScreen = False
+        app.showInstructionScreen = True
+
+    elif app.continueButton.isClicked(app) and app.showInstructionScreen:
+        app.showInstructionScreen = False
         app.showSelectScreen = True
 
     elif app.useHandsButton.isClicked(app) and app.showSelectScreen:
@@ -425,7 +465,7 @@ def onMousePress(app, mouseX, mouseY):
     elif app.classicButton.isClicked(app) and app.showSelectScreen:
         app.showSelectScreen = False
         app.classicGameMode = True
-        Game(app, 3, True, 10, "Easy")
+        Game(app, 3, True, 90, "Easy")
 
     elif app.showHighScores.isClicked(app) and app.showSelectScreen:
         app.showSelectScreen = False
@@ -447,7 +487,7 @@ def onMousePress(app, mouseX, mouseY):
         app.multiplayerGameMode = True
 
         app.useHands = True
-        Game(app, 3, True, 40, "Easy")
+        Game(app, 3, True, 90, "Easy")
 
     elif app.resetButton.isClicked(app) and (app.endGameScreen or app.endMultiGameMode):
         app.showSplashScreen = True
@@ -498,6 +538,8 @@ def redrawAll(app):
         screen.drawHighScore(app, screen)
     elif app.endMultiGameMode:
         screen.drawMultiAppEndScreen(app, screen)
+    elif app.showInstructionScreen:
+        screen.drawInstructions(app, screen)
 
 def classicGameMode(app):
     dead = False
@@ -565,7 +607,7 @@ def classicGameMode(app):
         else:
             for i in range(len(app.highScores[0])//2, len(app.highScores[0])):
                 if app.score > int(app.highScores[0][i]):
-                    for j in range(len(app.highScores[0]), i+1, -1):
+                    for j in range(len(app.highScores[0])-1, i+1, -1):
                         app.highScores[0][j] = str(int(app.highScores[0][j-1]))
                     app.highScores[0][i] = str(app.score)
                     break
