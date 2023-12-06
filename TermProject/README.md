@@ -9,3 +9,4 @@ Make sure to install:
     CMUGraphics - https://www.cs.cmu.edu/~112/notes/hw7.html
 
 prior to running the game for the game to work properly. Note: this game may only be compatible with Apple M1 Architecture.
+Additionally, the path variable at the top may not be printing the correct path. The path should navigate to the directory before the TermProject folder. If this is not working correctly, simply print the path using print(path) in the onAppStart function and see if the path is incorrect. If so, manually replace it with the correct path. 
